@@ -25,4 +25,5 @@ public class AppState
 {
     public AuthConfig Auth { get; set; } = new();
     public List<PlexLibrary> Libraries { get; set; } = new();
+    public string Language { get; set; } = "de";
 }
