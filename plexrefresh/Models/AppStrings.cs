@@ -14,6 +14,8 @@ public class AppStrings
     public string CheckAuthButton { get; init; } = "";
     public string ReloadLibsButton { get; init; } = "";
     public string LanguageButton { get; init; } = "";
+    public string AboutTabHeader { get; init; } = "";
+    public string ContactLabel { get; init; } = "";
 
     public string StatusReady { get; init; } = "";
     public string StatusNotConfigured { get; init; } = "";
@@ -51,6 +53,8 @@ public class AppStrings
         CheckAuthButton = "Auth prüfen",
         ReloadLibsButton = "Bibliotheken laden",
         LanguageButton = "EN",
+        AboutTabHeader = "Über",
+        ContactLabel = "Kontakt Email",
         StatusReady = "Bereit",
         StatusNotConfigured = "Bitte Server URL und Token eingeben, dann 'Speichern' und 'Auth prüfen' klicken. Danach 'Bibliotheken laden'.",
         StatusConfigLoaded = "Konfiguration geladen. Bitte 'Auth prüfen' klicken und anschließend 'Bibliotheken laden'.",
@@ -88,6 +92,8 @@ public class AppStrings
         CheckAuthButton = "Check Auth",
         ReloadLibsButton = "Reload Libs",
         LanguageButton = "DE",
+        AboutTabHeader = "About",
+        ContactLabel = "Contact Email",
         StatusReady = "Ready",
         StatusNotConfigured = "Please enter Server URL and Token, then click 'Save' and 'Check Auth'. Afterwards click 'Reload Libs'.",
         StatusConfigLoaded = "Configuration loaded. Please click 'Check Auth' and then 'Reload Libs'.",

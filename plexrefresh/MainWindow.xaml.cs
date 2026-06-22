@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using plexrefresh.ViewModels;
 
 namespace plexrefresh;
@@ -44,17 +46,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnSaveConfigClick(object sender, RoutedEventArgs e)
+    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
     {
-        // This method can be removed if using Command binding in XAML, 
-        // but keeping it for compatibility if someone still calls it.
-        if (DataContext is MainViewModel vm)
-        {
-            vm.Token = TokenBox.Password;
-            if (vm.SaveConfigCommand.CanExecute(null))
-            {
-                vm.SaveConfigCommand.Execute(null);
-            }
-        }
+        Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
     }
 }

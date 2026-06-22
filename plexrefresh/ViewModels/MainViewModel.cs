@@ -100,6 +100,9 @@ public class MainViewModel : INotifyPropertyChanged
 
     public AppStrings CurrentStrings => _state.Language == "en" ? AppStrings.En : AppStrings.De;
 
+    public static string AppVersion =>
+        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(2) ?? "1.0";
+
     public ICommand RefreshLibraryCommand { get; }
     public ICommand RefreshFolderCommand { get; }
     public ICommand ReloadLibrariesCommand { get; }
