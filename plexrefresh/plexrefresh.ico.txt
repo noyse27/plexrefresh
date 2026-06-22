@@ -1,0 +1,1 @@
+﻿PLACEHOLDER: Convert plexrefresh\icon.png to plexrefresh\plexrefresh.ico (multi-size 16,24,32,48,64,128,256). This text file is a reminder; replace with actual .ico.
