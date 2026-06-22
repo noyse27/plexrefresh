@@ -38,7 +38,7 @@ public class FileStorageService : IStorageService
             });
             return state ?? new AppState();
         }
-        catch
+        catch (Exception)
         {
             return new AppState();
         }

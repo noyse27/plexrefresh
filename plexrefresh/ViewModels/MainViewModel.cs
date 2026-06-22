@@ -139,6 +139,8 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async Task InitializeAsync()
     {
+        try
+        {
         _state = await _storage.LoadAsync();
         
         OnPropertyChanged(nameof(ServerUrl));
@@ -173,6 +175,11 @@ public class MainViewModel : INotifyPropertyChanged
         else
         {
             Status = "Konfiguration geladen. Bitte 'Check authorization' klicken und anschließend 'Bibliotheken neu einlesen'.";
+        }
+        }
+        catch (Exception ex)
+        {
+            Status = "Fehler beim Starten: " + ex.Message;
         }
     }
 

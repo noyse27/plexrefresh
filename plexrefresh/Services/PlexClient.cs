@@ -17,6 +17,7 @@ public class PlexClient
     public PlexClient(HttpClient http)
     {
         _http = http;
+        _http.Timeout = TimeSpan.FromSeconds(30);
         // Identify as a Plex client - minimal headers
         _http.DefaultRequestHeaders.Add("X-Plex-Product", "plexrefresh");
         _http.DefaultRequestHeaders.Add("X-Plex-Version", "1.0");
@@ -81,14 +82,14 @@ public class PlexClient
     public async Task<bool> CheckAuthAsync()
     {
         using var req = CreateRequest(HttpMethod.Get, "library/sections");
-        var resp = await _http.SendAsync(req);
+        using var resp = await _http.SendAsync(req);
         return resp.IsSuccessStatusCode;
     }
 
     public async Task<List<PlexLibrary>> GetLibrariesAsync()
     {
         using var req = CreateRequest(HttpMethod.Get, "library/sections");
-        var resp = await _http.SendAsync(req);
+        using var resp = await _http.SendAsync(req);
         resp.EnsureSuccessStatusCode();
         var xml = XDocument.Parse(await resp.Content.ReadAsStringAsync());
         // Plex returns XML. Parse Directory nodes
@@ -113,7 +114,7 @@ public class PlexClient
     {
         // Try the section details first
         using var req = CreateRequest(HttpMethod.Get, $"library/sections/{libraryKey}?includeLocations=1");
-        var resp = await _http.SendAsync(req);
+        using var resp = await _http.SendAsync(req);
         var locations = new List<PlexFolder>();
         if (resp.IsSuccessStatusCode)
         {
@@ -135,7 +136,7 @@ public class PlexClient
         if (locations.Count == 0)
         {
             using var req2 = CreateRequest(HttpMethod.Get, "library/sections");
-            var listResp = await _http.SendAsync(req2);
+            using var listResp = await _http.SendAsync(req2);
             listResp.EnsureSuccessStatusCode();
             var listXml = XDocument.Parse(await listResp.Content.ReadAsStringAsync());
             var matchingDir = listXml
@@ -160,7 +161,7 @@ public class PlexClient
     public async Task RefreshLibraryAsync(string libraryKey)
     {
         using var req = CreateRequest(HttpMethod.Get, $"library/sections/{libraryKey}/refresh");
-        var resp = await _http.SendAsync(req);
+        using var resp = await _http.SendAsync(req);
         resp.EnsureSuccessStatusCode();
     }
 
@@ -171,12 +172,12 @@ public class PlexClient
         var pathParam = Uri.EscapeDataString(folderPath);
         var requestUri = $"library/sections/{libraryKey}/refresh?path={pathParam}";
         using var req = CreateRequest(HttpMethod.Get, requestUri);
-        var resp = await _http.SendAsync(req);
+        using var resp = await _http.SendAsync(req);
         if (!resp.IsSuccessStatusCode)
         {
             // Try legacy refresh all
             using var req2 = CreateRequest(HttpMethod.Get, $"library/sections/{libraryKey}/refresh");
-            var fallback = await _http.SendAsync(req2);
+            using var fallback = await _http.SendAsync(req2);
             fallback.EnsureSuccessStatusCode();
         }
     }
