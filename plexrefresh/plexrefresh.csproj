@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>plexrefresh.ico</ApplicationIcon>
+        <Version>1.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Product>Plex Refresh</Product>
+        <Company>PolzeSoft</Company>
+        <Copyright>© PolzeSoft 2026</Copyright>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Resource Include="icon.png" />
+    </ItemGroup>
+
+    <!-- Inline MSBuild task to generate an .ico from the existing PNG so shortcuts show the app icon -->
+    <UsingTask TaskName="PngToIco" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+      <ParameterGroup>
+        <InputPng ParameterType="System.String" Required="true" />
+        <OutputIco ParameterType="System.String" Required="true" />
+      </ParameterGroup>
+      <Task>
+        <Code Type="Class" Language="cs"><![CDATA[
+using System;
+using System.IO;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class PngToIco : Task
+{
+    [Required]
+    public string InputPng { get; set; } = string.Empty;
+
+    [Required]
+    public string OutputIco { get; set; } = string.Empty;
+
+    public override bool Execute()
+    {
+        try
+        {
+            if (!File.Exists(InputPng))
+            {
+                Log.LogError($"Input PNG not found: {InputPng}");
+                return false;
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(OutputIco)) ?? ".");
+            var png = File.ReadAllBytes(InputPng);
+            if (png.Length < 33 || png[0]!=0x89 || png[1]!=0x50 || png[2]!=0x4E || png[3]!=0x47)
+            {
+                Log.LogError("Input file is not a valid PNG.");
+                return false;
+            }
+            // Parse PNG width/height from IHDR (bytes 16-23, big-endian)
+            int width = ReadInt32BE(png, 16);
+            int height = ReadInt32BE(png, 20);
+            byte w = (byte)(width >= 256 ? 0 : width);
+            byte h = (byte)(height >= 256 ? 0 : height);
+            using (var fs = new FileStream(OutputIco, FileMode.Create, FileAccess.Write))
+            using (var bw = new BinaryWriter(fs))
+            {
+                // ICONDIR
+                bw.Write((ushort)0); // reserved
+                bw.Write((ushort)1); // type 1 = icon
+                bw.Write((ushort)1); // count
+                // ICONDIRENTRY
+                bw.Write(w);                // width (0 means 256)
+                bw.Write(h);                // height (0 means 256)
+                bw.Write((byte)0);          // color count
+                bw.Write((byte)0);          // reserved
+                bw.Write((ushort)1);        // planes
+                bw.Write((ushort)32);       // bit count
+                bw.Write(png.Length);       // bytes in resource
+                bw.Write(6 + 16);           // image offset (ICONDIR 6 bytes + entry 16 bytes)
+                // PNG data
+                bw.Write(png);
+            }
+            Log.LogMessage(MessageImportance.High, $"Generated ICO: {OutputIco} (from {InputPng}, {width}x{height})");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.LogErrorFromException(ex, true);
+            return false;
+        }
+    }
+
+    private static int ReadInt32BE(byte[] data, int offset)
+    {
+        return (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
+    }
+}
+        ]]></Code>
+      </Task>
+    </UsingTask>
+
+    <Target Name="EnsureIco" BeforeTargets="PrepareForBuild">
+      <Message Text="Ensuring plexrefresh.ico exists..." Importance="Low" />
+      <PngToIco InputPng="icon.png" OutputIco="plexrefresh.ico" />
+    </Target>
+
+</Project>
