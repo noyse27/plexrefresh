@@ -2,6 +2,8 @@
 
 Ein kleines Windows-Tool zum manuellen Anstoßen von Plex-Bibliothek-Scans — ohne den Plex-Web-Client öffnen zu müssen.
 
+![Screenshot](docs/screenshot.png)
+
 ![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)
 ![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows)
 ![License](https://img.shields.io/badge/license-MIT-green)
